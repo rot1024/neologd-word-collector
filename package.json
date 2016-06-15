@@ -1,0 +1,32 @@
+{
+  "name": "neologd-word-collector",
+  "version": "1.0.0",
+  "description": "Word collector not recorded in neologd",
+  "main": "index.js",
+  "bin": "bin/index.js",
+  "scripts": {
+    "start": "node bin",
+    "test": "mocha",
+    "lint": "eslint **/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/rot1024/neologd-word-collector.git"
+  },
+  "author": "rot1024",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rot1024/neologd-word-collector/issues"
+  },
+  "homepage": "https://github.com/rot1024/neologd-word-collector#readme",
+  "engines": {
+    "node": ">=6"
+  },
+  "devDependencies": {
+    "eslint": "^2.12.0",
+    "eslint-plugin-node": "^1.4.0",
+    "mocha": "^2.5.3"
+  },
+  "dependencies": {
+  }
+}
