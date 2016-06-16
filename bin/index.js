@@ -43,8 +43,12 @@ const argv = yargv
       console.log("DONE!");
     }).catch(err => {
       stream.end();
-      console.log("ERROR!");
-      console.log(err.stack || err.message || err);
+      console.error(os.EOL + "ERROR!");
+      if (err instanceof collector.scraper.FetchError) {
+        console.error(err.stack || err.message || err);
+      } else {
+        console.error(err.error);
+      }
     }, args.char, args.page, 1, 1, 1000);
 
   })
