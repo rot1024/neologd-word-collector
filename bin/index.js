@@ -15,15 +15,14 @@ const argv = yargv
   .command("scrape", "Scrape data from nicodic", {
     char: {
       alias: "c",
-      default: 0,
-      type: "number",
-      description: "Specify character index: ア = 0"
+      type: "string",
+      description: "Specify start character"
     },
     page: {
       alias: "p",
       default: 0,
       type: "number",
-      description: "Specify page index"
+      description: "Specify start page index"
     }
   }, args => {
 
