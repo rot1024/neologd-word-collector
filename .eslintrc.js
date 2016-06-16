@@ -160,7 +160,7 @@ module.exports = {
     "prefer-spread": 1,
     "prefer-template": 0,
     "quote-props": [1, "as-needed", {
-      "keywords": true,
+      "keywords": false,
       "numbers": true
     }],
     "quotes": [1, "double", { "avoidEscape": true, "allowTemplateLiterals": true }],
