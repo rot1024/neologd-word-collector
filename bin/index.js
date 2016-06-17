@@ -19,13 +19,12 @@ function scrape(args) {
 
     const stream = fs.createWriteStream(args.output, { flags: "a" });
 
-    let resume, firstCharIndex, firstPageIndex;
+    let firstCharIndex, firstPageIndex;
     try {
-      resume = JSON.parse(fs.readFileSync(args.resume, "utf8"));
+      const resume = JSON.parse(fs.readFileSync(args.resume, "utf8"));
       firstCharIndex = resume.page < resume.max ? resume.charIndex : resume.charIndex + 1;
       firstPageIndex = resume.page < resume.max ? resume.page : 0;
     } catch (e) {
-      resume = {};
       firstCharIndex = args.char;
       firstPageIndex = args.page;
     }
@@ -40,8 +39,8 @@ function scrape(args) {
         },
         firstCharIndex,
         firstPageIndex,
-        concurrency: 1,
-        concurrencyForEachCharacter: args.concurrency,
+        concurrency: args.concurrency,
+        concurrencyForEachCharacter: 1,
         waitMillisec: args.interval
       });
 
@@ -81,7 +80,7 @@ const argv = yargs
 
   .command("scrape", "Scrape data from nicodic", {
     char: {
-      alias: "c",
+      alias: "s",
       default: 0,
       type: "number",
       description: "Specify start character index"
