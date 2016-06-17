@@ -2,12 +2,6 @@
 
 Word collector not recorded in neologd
 
-## Steps
-
-1. Download neologd csv files
-2. Make word set
-3. Fetch nicodic pages and write results to a file
-
 ## Requirement
 
 Node.js v6.x.x
