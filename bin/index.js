@@ -30,7 +30,10 @@ const argv = yargv
 
     const bar = new ProgressBar("[:bar] :c :current/:total :percent :eta", { total: 1, width: 20 });
 
-    const stream = fs.createWriteStream(path.resolve(__dirname, "..", "cache", "words.txt"));
+    const stream = fs.createWriteStream(
+      path.resolve(__dirname, "..", "cache", "words.txt"),
+      { flags: "a" }
+    );
 
     collector.scraper.scrapeAll((p, m, w, c) => {
       stream.write(w.map(ww => ww.name + "\t" + ww.yomi).join(os.EOL) + os.EOL);
@@ -42,11 +45,11 @@ const argv = yargv
       console.log("DONE!");
     }).catch(err => {
       stream.end();
-      console.error(os.EOL + "ERROR!");
-      if (err instanceof collector.scraper.FetchError) {
-        console.error(err.stack || err.message || err);
+      console.error(os.EOL + os.EOL + "ERROR!");
+      if (err.error && err.error.statusCode) {
+        console.log("FetchError! Status code: " + err.error.statusCode);
       } else {
-        console.error(err.error);
+        console.error(err.stack || err.message || err);
       }
     }, args.char, args.page, 1, 1, 1000);
 
