@@ -2,7 +2,6 @@
 "use strict";
 
 const fs = require("fs");
-const path = require("path");
 const os = require("os");
 
 const ProgressBar = require("progress");
@@ -16,14 +15,13 @@ function scrape(args) {
 
     console.log("Start scraping");
 
-    const resumeFile = path.resolve(__dirname, "..", "cache", "resume.json");
     const bar = new ProgressBar("[:bar] :i :c :current/:total :percent :eta s", { total: 1, width: 20 });
 
     const stream = fs.createWriteStream(args.output, { flags: "a" });
 
     let resume, firstCharIndex, firstPageIndex;
     try {
-      resume = JSON.parse(fs.readFileSync(resumeFile, "utf8"));
+      resume = JSON.parse(fs.readFileSync(args.resume, "utf8"));
       firstCharIndex = resume.page < resume.max ? resume.charIndex : resume.charIndex + 1;
       firstPageIndex = resume.page < resume.max ? resume.page : 0;
     } catch (e) {
@@ -36,7 +34,7 @@ function scrape(args) {
       yield collector.scraper.scrapeAll({
         progressCb(c, i, p, m, w) {
           stream.write(w.map(ww => ww.name + "\t" + ww.yomi).join(os.EOL) + os.EOL);
-          fs.writeFile(resumeFile, JSON.stringify({ char: c, charIndex: i, page: p, max: m }));
+          fs.writeFile(args.resume, JSON.stringify({ char: c, charIndex: i, page: p, max: m }));
           bar.total = m;
           bar.tick(p - bar.curr, { c, i });
         },
@@ -99,6 +97,12 @@ const argv = yargs
       type: "string",
       description: "Specify output file path"
     },
+    resume: {
+      alias: "r",
+      default: "cache/resume.json",
+      type: "string",
+      description: "Specify file to save the progress"
+    },
     concurrency: {
       alias: "c",
       default: 1,
@@ -153,6 +157,12 @@ const argv = yargs
       type: "string",
       required: true
     },
+    resume: {
+      alias: "r",
+      default: "cache/resume.json",
+      type: "string",
+      description: "Specify file to save the progress"
+    },
     concurrency: {
       alias: "c",
       default: 1,
@@ -164,8 +174,17 @@ const argv = yargs
       type: "number"
     }
   }, args => {
-    scrape({ output: args.words })
-    .then(() => drop({ input: args.words, output: args.output, dictionary: args.dictionary }))
+    scrape({
+      output: args.words,
+      resume: args.resume,
+      concurrency: args.concurrency,
+      interval: args.interval
+    })
+    .then(() => drop({
+      input: args.words,
+      output: args.output,
+      dictionary: args.dictionary
+    }))
     .catch(err => {
       console.error(err.stack || err);
     });
