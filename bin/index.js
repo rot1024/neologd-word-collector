@@ -6,11 +6,12 @@ const path = require("path");
 const os = require("os");
 
 const ProgressBar = require("progress");
-const yargv = require("yargs");
+const yargs = require("yargs");
+const co = require("co");
 
 const collector = require("..");
 
-const argv = yargv
+const argv = yargs
 
   .command("scrape", "Scrape data from nicodic", {
     char: {
@@ -74,9 +75,47 @@ const argv = yargv
 
   })
 
+  .command("drop", "Drop words recorded in dictionary and write results to file", {
+    input: {
+      alias: "i",
+      type: "string",
+      required: true,
+      default: "cache/words.txt"
+    },
+    output: {
+      alias: "o",
+      type: "string",
+      required: true,
+      default: "cache/results.txt"
+    },
+    dictionary: {
+      alias: "d",
+      type: "string",
+      required: true
+    }
+  }, args => {
+
+    co(function *() {
+
+      console.log("Loading dictionary...");
+
+      const set = yield collector.dropper.createDictionarySet(args.dictionary);
+
+      console.log("Dropping words...");
+
+      const count = yield collector.dropper.drop(args.input, set, args.output);
+
+      console.log("DONE! " + count + " words are recorded!");
+
+    }).catch(err => {
+      console.error(err.stack || err);
+    });
+
+  })
+
   .help()
   .argv;
 
 if (!argv._[0]) {
-  yargv.showHelp();
+  yargs.showHelp();
 }

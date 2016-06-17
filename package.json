@@ -28,6 +28,7 @@
     "mocha": "^2.5.3"
   },
   "dependencies": {
+    "byline": "^4.2.1",
     "cheerio-httpcli": "^0.6.8",
     "co": "^4.6.0",
     "progress": "^1.1.8",
