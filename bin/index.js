@@ -29,7 +29,7 @@ const argv = yargv
     console.log("Start scraping");
 
     const resumeFile = path.resolve(__dirname, "..", "cache", "resume.json");
-    const bar = new ProgressBar("[:bar] :c :current/:total :percent :eta", { total: 1, width: 20 });
+    const bar = new ProgressBar("[:bar] :i :c :current/:total :percent :eta s", { total: 1, width: 20 });
 
     const stream = fs.createWriteStream(
       path.resolve(__dirname, "..", "cache", "words.txt"),
@@ -52,7 +52,7 @@ const argv = yargv
         stream.write(w.map(ww => ww.name + "\t" + ww.yomi).join(os.EOL) + os.EOL);
         fs.writeFile(resumeFile, JSON.stringify({ char: c, charIndex: i, page: p, max: m }));
         bar.total = m;
-        bar.tick(p - bar.curr, { c });
+        bar.tick(p - bar.curr, { c, i });
       },
       firstCharIndex,
       firstPageIndex,
