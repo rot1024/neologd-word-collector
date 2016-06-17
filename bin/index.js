@@ -35,11 +35,18 @@ const argv = yargv
       { flags: "a" }
     );
 
-    collector.scraper.scrapeAll((p, m, w, c) => {
-      stream.write(w.map(ww => ww.name + "\t" + ww.yomi).join(os.EOL) + os.EOL);
-      bar.total = m;
-      bar.current = p;
-      bar.tick({ c });
+    collector.scraper.scrapeAll({
+      progressCb(p, m, w, c) {
+        stream.write(w.map(ww => ww.name + "\t" + ww.yomi).join(os.EOL) + os.EOL);
+        bar.total = m;
+        bar.current = p;
+        bar.tick({ c });
+      },
+      firstChar: args.char,
+      firstPageIndex: args.page,
+      concurrency: 1,
+      concurrencyForEachCharacter: 1,
+      waitMillisec: 1000
     }).then(() => {
       stream.end();
       console.log("DONE!");
@@ -51,7 +58,7 @@ const argv = yargv
       } else {
         console.error(err.stack || err.message || err);
       }
-    }, args.char, args.page, 1, 1, 1000);
+    });
 
   })
 
