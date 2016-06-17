@@ -28,6 +28,7 @@ const argv = yargv
 
     console.log("Start scraping");
 
+    const resumeFile = path.resolve(__dirname, "..", "cache", "resume.json");
     const bar = new ProgressBar("[:bar] :c :current/:total :percent :eta", { total: 1, width: 20 });
 
     const stream = fs.createWriteStream(
@@ -35,15 +36,26 @@ const argv = yargv
       { flags: "a" }
     );
 
+    let resume, firstCharIndex, firstPageIndex;
+    try {
+      resume = JSON.parse(fs.readFileSync(resumeFile, "utf8"));
+      firstCharIndex = resume.page < resume.max ? resume.charIndex : resume.charIndex + 1;
+      firstPageIndex = resume.page < resume.max ? resume.page : 0;
+    } catch (e) {
+      resume = {};
+      firstCharIndex = args.char;
+      firstPageIndex = args.pageIndex;
+    }
+
     collector.scraper.scrapeAll({
-      progressCb(p, m, w, c) {
+      progressCb(c, i, p, m, w) {
         stream.write(w.map(ww => ww.name + "\t" + ww.yomi).join(os.EOL) + os.EOL);
+        fs.writeFile(resumeFile, JSON.stringify({ char: c, charIndex: i, page: p, max: m }));
         bar.total = m;
-        bar.current = p;
-        bar.tick({ c });
+        bar.tick(p - bar.curr, { c });
       },
-      firstChar: args.char,
-      firstPageIndex: args.page,
+      firstCharIndex,
+      firstPageIndex,
       concurrency: 1,
       concurrencyForEachCharacter: 1,
       waitMillisec: 1000
