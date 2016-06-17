@@ -27,7 +27,7 @@ function scrape(args) {
     } catch (e) {
       resume = {};
       firstCharIndex = args.char;
-      firstPageIndex = args.pageIndex;
+      firstPageIndex = args.page;
     }
 
     try {
@@ -82,8 +82,9 @@ const argv = yargs
   .command("scrape", "Scrape data from nicodic", {
     char: {
       alias: "c",
-      type: "string",
-      description: "Specify start character"
+      default: 0,
+      type: "number",
+      description: "Specify start character index"
     },
     page: {
       alias: "p",
