@@ -43,8 +43,8 @@ function scrape(args) {
         firstCharIndex,
         firstPageIndex,
         concurrency: 1,
-        concurrencyForEachCharacter: 1,
-        waitMillisec: 1000
+        concurrencyForEachCharacter: args.concurrency,
+        waitMillisec: args.interval
       });
 
       console.log("DONE!");
@@ -98,6 +98,16 @@ const argv = yargs
       default: "cache/words.txt",
       type: "string",
       description: "Specify output file path"
+    },
+    concurrency: {
+      alias: "c",
+      default: 1,
+      type: "number"
+    },
+    interval: {
+      alias: "i",
+      default: 1000,
+      type: "number"
     }
   }, args => {
     scrape(args).catch(err => {
@@ -142,6 +152,16 @@ const argv = yargs
       alias: "d",
       type: "string",
       required: true
+    },
+    concurrency: {
+      alias: "c",
+      default: 1,
+      type: "number"
+    },
+    interval: {
+      alias: "i",
+      default: 1000,
+      type: "number"
     }
   }, args => {
     scrape({ output: args.words })
