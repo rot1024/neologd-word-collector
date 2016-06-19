@@ -31,7 +31,7 @@
     "cheerio-httpcli": "^0.6.8",
     "co": "^4.6.0",
     "gauge": "^2.6.0",
-    "scrapist": "git+https://github.com/rot1024/scrapist.git",
+    "scrapist": "^0.1.0",
     "throat": "^3.0.0",
     "yargs": "^4.7.1"
   }
