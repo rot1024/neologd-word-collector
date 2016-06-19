@@ -4,51 +4,99 @@
 const fs = require("fs");
 const os = require("os");
 
-const ProgressBar = require("progress");
+const Gauge = require("gauge");
 const yargs = require("yargs");
 const co = require("co");
 
 const collector = require("..");
+
+function showProgress(gauge, curr, total, char, pageIndex, pageCount) {
+  gauge.show(`${char} ${pageIndex + 1}/${pageCount} | ${curr}/${total} ${Math.round(curr / total * 100)}%`, curr / total);
+}
 
 function scrape(args) {
   return co(function *() {
 
     console.log("Start scraping");
 
-    const bar = new ProgressBar("[:bar] :i :c :current/:total :percent :eta s", { total: 1, width: 20 });
+    const gauge = new Gauge({
+      updateInterval: 50,
+      theme: "ASCII"
+    });
+
+    const progress = (() => {
+      try {
+        return JSON.parse(fs.readFileSync(args.resume, "utf8"));
+      } catch (e) {
+        return { charIndex: 0, pageIndex: 0 };
+      }
+    })();
 
     const stream = fs.createWriteStream(args.output, { flags: "a" });
 
-    let firstCharIndex, firstPageIndex;
-    try {
-      const resume = JSON.parse(fs.readFileSync(args.resume, "utf8"));
-      firstCharIndex = resume.page < resume.max ? resume.charIndex : resume.charIndex + 1;
-      firstPageIndex = resume.page < resume.max ? resume.page : 0;
-    } catch (e) {
-      firstCharIndex = args.char;
-      firstPageIndex = args.page;
-    }
+    let total = -1;
+    let curr = 0;
+    let spin;
 
     try {
-      yield collector.scraper.scrapeAll({
-        progressCb(c, i, p, m, w) {
-          stream.write(w.map(ww => ww.name + "\t" + ww.yomi).join(os.EOL) + os.EOL);
-          fs.writeFile(args.resume, JSON.stringify({ char: c, charIndex: i, page: p, max: m }));
-          bar.total = m;
-          bar.tick(p - bar.curr, { c, i });
+      yield collector.nicodic.scrape({
+        charIndex: progress.charIndex,
+        pageIndex: progress.pageIndex
+      }, {
+        onData(data, ctx) {
+
+          if (ctx.depth === 0) {
+
+            const startPage = Math.min(data.count[data.start] - 1, ctx.param.pageIndex);
+
+            total = data.count.reduce((a, b) => a + b, 0);
+            curr = data.count.slice(0, data.start).reduce((a, b) => a + b, 0) + startPage;
+
+            spin = setInterval(() => { gauge.pulse(); }, 100);
+
+            showProgress(
+              gauge,
+              curr,
+              total,
+              data.characters[data.start],
+              startPage,
+              data.count[data.start]
+            );
+
+          } else if (ctx.depth === 2) {
+
+            stream.write(data.map(d => d.name + "\t" + d.yomi).join(os.EOL) + os.EOL);
+
+            fs.writeFile(args.resume, JSON.stringify({
+              charIndex: ctx.parentData.charIndex,
+              pageIndex: ctx.parentData.pageIndex + ctx.index
+            }));
+
+            showProgress(
+              gauge,
+              ++curr,
+              total,
+              ctx.parentData.char,
+              ctx.parentData.pageIndex + ctx.index,
+              ctx.parentData.count
+            );
+
+          }
+
         },
-        firstCharIndex,
-        firstPageIndex,
         concurrency: args.concurrency,
-        concurrencyForEachCharacter: 1,
-        waitMillisec: args.interval
+        interval: args.interval,
+        trial: 5,
+        trialInterval: 5000
       });
 
+      clearInterval(spin);
+      gauge.hide();
       console.log("DONE!");
     } catch (err) {
       console.error(os.EOL + os.EOL + "ERROR!");
-      if (err.error && err.error.statusCode) {
-        console.log("FetchError! Status code: " + err.error.statusCode);
+      if (err.url || err.statusCode) {
+        console.log("FetchError", err.statusCode, err.url);
       } else {
         console.error(err.stack || err.message || err);
       }
