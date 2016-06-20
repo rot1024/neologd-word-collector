@@ -1,9 +1,10 @@
 {
   "name": "neologd-word-collector",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Word collector not recorded in neologd",
   "main": "index.js",
   "bin": "bin/index.js",
+  "private": true,
   "scripts": {
     "start": "node bin",
     "test": "echo \"Error: no test specified\" && exit 1",
