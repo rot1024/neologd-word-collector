@@ -141,7 +141,7 @@ const argv = yargs
     },
     output: {
       alias: "o",
-      default: "cache/words.txt",
+      default: "cache/words.tsv",
       type: "string",
       description: "Specify output file path"
     },
@@ -171,12 +171,12 @@ const argv = yargs
     input: {
       alias: "i",
       type: "string",
-      default: "cache/words.txt"
+      default: "cache/words.tsv"
     },
     output: {
       alias: "o",
       type: "string",
-      default: "cache/results.txt"
+      default: "cache/results.tsv"
     },
     dictionary: {
       alias: "d",
@@ -193,12 +193,12 @@ const argv = yargs
     words: {
       alias: "w",
       type: "string",
-      default: "cache/words.txt"
+      default: "cache/words.tsv"
     },
     output: {
       alias: "o",
       type: "string",
-      default: "cache/results.txt"
+      default: "cache/results.tsv"
     },
     dictionary: {
       alias: "d",
