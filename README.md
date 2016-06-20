@@ -1,6 +1,6 @@
 # neologd-word-collector
 
-Word collector not recorded in neologd
+Nicodic word collector not recorded in NEologd
 
 ## Requirement
 
@@ -15,6 +15,7 @@ cd neologd-word-collector
 npm install
 xz -dk ../mecab-ipadic-neologd/seed/*.xz
 cat ../mecab-ipadic-neologd/seed/*.csv > cache/seed.csv
- npm start -- scrape
-npm start -- drop -d cache/seed.csv
+npm start -- --help # show help
+ npm start -- scrape # scrape title and title pronunciation of all articles of niconico dictionary
+npm start -- drop -d cache/seed.csv # drop words already recorded in NEologd
 ```
