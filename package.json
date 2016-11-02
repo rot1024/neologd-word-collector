@@ -24,16 +24,16 @@
     "node": ">=6"
   },
   "devDependencies": {
-    "eslint": "^2.13.0",
-    "eslint-plugin-node": "^1.5.0"
+    "eslint": "^3.9.1",
+    "eslint-plugin-node": "^3.0.3"
   },
   "dependencies": {
-    "byline": "^4.2.1",
+    "byline": "^5.0.0",
     "cheerio-httpcli": "^0.6.8",
     "co": "^4.6.0",
     "gauge": "^2.6.0",
     "scrapist": "^0.1.0",
     "throat": "^3.0.0",
-    "yargs": "^4.7.1"
+    "yargs": "^6.3.0"
   }
 }
